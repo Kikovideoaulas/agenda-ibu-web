@@ -1,0 +1,34 @@
+AGENDA IBU WEB — ÁREA DOS CLIENTES
+
+O QUE ESTÁ PRONTO
+- Identidade visual e logo circular transparente.
+- Cadastro, login, recuperação de senha, minha conta.
+- Agendamento presencial/online, serviços, preços, horários e bloqueios.
+- Consulta da agenda real, horários ocupados e meus agendamentos.
+- Gravação de agendamentos no MESMO projeto e coleções do app Android.
+- Botão de WhatsApp (19) 99458-4954.
+- Nenhuma opção administrativa nem limpeza de agendamentos.
+
+ANTES DE PUBLICAR (OBRIGATÓRIO)
+1. A configuração pública do Agenda IBU Web já está preenchida para o projeto agendafacilpro-90635.
+2. Em Authentication > Configurações > Domínios autorizados, confirme o domínio de Hosting que será usado.
+3. As regras do Firestore devem permitir o mesmo acesso de clientes que já usam o aplicativo Android. NÃO substitua regras existentes sem revisar.
+4. Antes de abrir para clientes, teste cadastro, login, agendamento e exibição no aplicativo administrador. O site ainda não foi testado contra o Firebase real.
+
+PUBLICAÇÃO (FIREBASE HOSTING)
+A pasta AGENDA_IBU_WEB contém firebase.json e .firebaserc já apontando para o projeto agendafacilpro-90635.
+Em um ambiente com Firebase CLI e login autorizado, dentro desta pasta execute:
+  firebase deploy --only hosting --project agendafacilpro-90635
+
+Isso publica APENAS o site. Não altera app Android nem regras Firestore.
+O endereço esperado após publicação no site padrão é:
+  https://agendafacilpro-90635.web.app
+Confirme no console após implantar. Registrar um aplicativo Web no Firebase NÃO publica automaticamente um site.
+
+ATENÇÃO À CONCORRÊNCIA
+A versão Web verifica existência dos documentos de agendamento e disponibilidade em transação antes de criar. A versão Android pode utilizar lote simples: a proteção total contra sobrescrita por clientes simultâneos requer regras de segurança robustas e/ou um serviço de reserva no servidor. Faça teste simultâneo entre dois celulares antes do lançamento.
+
+ATENÇÃO AOS DADOS REAIS
+Não execute ferramentas de limpeza, restauração ou reinício de dados de teste após abrir agendamentos reais.
+
+Desenvolvido por Junior Freitas.
