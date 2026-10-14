@@ -6,6 +6,5 @@ const firebaseConfig = {
   messagingSenderId: "614263823341",
   appId: "1:614263823341:web:8cd9acb8add9c51ae7e5e4"
 };
-
 window.firebaseConfig = firebaseConfig;
 window.AGENDA_IBU_CONFIG = firebaseConfig;
