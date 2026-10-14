@@ -190,8 +190,8 @@ async function confirmar(){
     const s=`ATENDIMENTO ${modo.toUpperCase()}\n${detalhes}\nModalidade: ${modo}`;
 
     await db.runTransaction(async tr=>{
-      const [free,existing]=await Promise.all([tr.get(ref),tr.get(book)]);
-      if(free.exists||existing.exists)throw Error('Este horário acabou de ser reservado por outra pessoa.');
+      const free=await tr.get(ref);
+      if(free.exists)throw Error('Este horário acabou de ser reservado por outra pessoa.');
       tr.set(book,{clienteId:user.uid,nome:n,telefone:t,servico:s,data,hora,criadoEm:firebase.firestore.FieldValue.serverTimestamp()});
       tr.set(ref,{data,hora});
     });
