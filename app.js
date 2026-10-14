@@ -84,7 +84,7 @@ const valorSelecionado=()=>[...selec].reduce((s,i)=>s+servicos[i][1],0);
 function agendar(){if(!user)return login();selec=new Set();modo='';data='';hora='';modoHora='';desenharAgendamento()}
 
 function desenharAgendamento(){
-  view(`<h2>Novo agendamento</h2><p class="muted">▣ Dias e horários disponíveis conforme o Instituto</p>${input('name','● NOME COMPLETO','text',perfil?.nome||user.displayName||'')}${input('tel','● SEU WHATSAPP','tel',perfil?.telefone||'')}<h3>Escolha a modalidade</h3><div class="row"><button class="mode ${modo==='Presencial'?'selected':''}" id="p"><img src="logo-ibu.png" alt="">Atendimento presencial</button><button class="mode ${modo==='Online'?'selected':''}" id="o"><img src="logo-ibu.png" alt="">Atendimento Online</button></div><h3>Selecione os atendimentos desejados</h3><p class="muted">Marque um ou mais atendimentos. Os valores serão somados automaticamente.</p><div class="services" id="services"></div><div class="total" id="total"></div><h3>Escolha a data</h3><input type="date" id="date" min="${hoje()}" value="${esc(data)}"><p id="status" class="muted">Selecione uma data para consultar os horários.</p><button class="secondary" id="refresh">Atualizar horários</button><div class="slots" id="slots"></div><button id="confirm">Confirmar agendamento</button><button class="secondary" id="back">Voltar</button>`);
+  view(`<h2>Novo agendamento</h2><p class="muted">▣ Dias e horários disponíveis conforme o Instituto</p>${input('name','● NOME COMPLETO','text',perfil?.nome||user.displayName||'')}${input('tel','● SEU WHATSAPP','tel',perfil?.telefone||'')}<h3>Escolha a modalidade</h3><div class="row"><button class="mode ${modo==='Presencial'?'selected':''}" id="p"><img src="logo-ibu.png" alt="">Atendimento presencial</button><button class="mode ${modo==='Online'?'selected':''}" id="o"><img src="logo-ibu.png" alt="">Atendimento Online</button></div><h3>Selecione os atendimentos desejados</h3><p class="muted">Marque um ou mais atendimentos. Os valores serão somados automaticamente.</p><div class="services" id="services"></div><div class="total" id="total"></div><h3>Escolha a data</h3><p id="dataEscolhida" class="muted">${data?`Data: ${dataBR(data)}`:'Nenhuma data selecionada.'}</p><button id="chooseDate">Escolher data de atendimento</button><p id="status" class="muted">${data?'Toque em um horário livre.':'Selecione um horário.'}</p><button class="secondary" id="refresh">Atualizar horários</button><div class="slots" id="slots"></div><button id="confirm">Confirmar agendamento</button><button class="secondary" id="back">Voltar</button>`);
   const box=el('services');
   servicos.forEach(([n,p],i)=>{
     const lab=document.createElement('label'),c=document.createElement('input');
@@ -96,9 +96,79 @@ function desenharAgendamento(){
   el('total').textContent=`Total: ${reais(valorSelecionado())}`;
   el('p').onclick=()=>{modo='Presencial';hora='';modoHora='';el('p').classList.add('selected');el('o').classList.remove('selected');grade()};
   el('o').onclick=()=>{modo='Online';hora='';modoHora='';el('o').classList.add('selected');el('p').classList.remove('selected');grade()};
-  el('date').onchange=()=>{data=el('date').value;hora='';modoHora='';consultar()};
-  el('refresh').onclick=consultar;el('confirm').onclick=confirmar;el('back').onclick=conta;
+  el('chooseDate').onclick=abrirCalendario;
+  el('refresh').onclick=()=>{if(!data)return msg('Escolha uma data.');consultar()};
+  el('confirm').onclick=confirmar;el('back').onclick=conta;
   if(data)consultar();
+}
+
+
+async function abrirCalendario(){
+  try{
+    const est=await db.collection('configuracoes').doc('estabelecimento').get({source:'server'});
+    dias=est.exists&&Array.isArray(est.data().diasSemana)?est.data().diasSemana:[1,2,3,4,5,6,7];
+  }catch(e){return erro(e)}
+
+  const base=data?(()=>{const [a,m,d]=data.split('-').map(Number);return new Date(a,m-1,d,12)})():new Date();
+  let ano=base.getFullYear(),mes=base.getMonth();
+
+  const fundo=document.createElement('div');
+  fundo.id='calendarOverlay';
+  fundo.style.cssText='position:fixed;inset:0;background:#0008;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px';
+
+  const caixa=document.createElement('div');
+  caixa.style.cssText='width:min(100%,430px);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;padding:20px;box-shadow:0 10px 35px #0005;color:#1d273e';
+  fundo.appendChild(caixa);
+  document.body.appendChild(fundo);
+
+  const nomesMes=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+  function render(){
+    const primeiro=new Date(ano,mes,1,12);
+    const ultimo=new Date(ano,mes+1,0,12).getDate();
+    const inicio=primeiro.getDay();
+    const min=hoje();
+
+    caixa.innerHTML=`
+      <h3 style="margin:0 0 18px;text-align:left">Escolha o dia de atendimento</h3>
+      <div style="display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center">
+        <button id="calPrev" style="margin:0;min-height:48px;padding:6px;font-size:25px">‹</button>
+        <strong style="text-align:center;font-size:20px">${nomesMes[mes]} ${ano}</strong>
+        <button id="calNext" style="margin:0;min-height:48px;padding:6px;font-size:25px">›</button>
+      </div>
+      <p style="font-size:14px;margin:15px 0"><b style="color:#f47815">Laranja:</b> dias liberados pelo administrador</p>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-weight:800;margin-bottom:6px">
+        <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+      </div>
+      <div id="calDays" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px"></div>
+      <button id="calClose" class="secondary" style="margin-top:18px">FECHAR</button>`;
+
+    const grid=caixa.querySelector('#calDays');
+    for(let i=0;i<inicio;i++)grid.appendChild(document.createElement('span'));
+
+    for(let d=1;d<=ultimo;d++){
+      const dt=new Date(ano,mes,d,12);
+      const ds=dt.getDay()+1;
+      const iso=`${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const liberado=iso>=min&&dias.includes(ds);
+      const b=document.createElement('button');
+      b.textContent=d;
+      b.style.cssText=`margin:0;min-height:45px;padding:5px;border-radius:10px;box-shadow:none;font-size:16px;${liberado?'background:#f47815;color:#fff':'background:#d7d9de;color:#737780'}`;
+      b.disabled=!liberado;
+      if(liberado)b.onclick=()=>{
+        data=iso;hora='';modoHora='';
+        fundo.remove();
+        const p=el('dataEscolhida');if(p)p.textContent=`Data: ${dataBR(data)}`;
+        consultar();
+      };
+      grid.appendChild(b);
+    }
+
+    caixa.querySelector('#calPrev').onclick=()=>{mes--;if(mes<0){mes=11;ano--}render()};
+    caixa.querySelector('#calNext').onclick=()=>{mes++;if(mes>11){mes=0;ano++}render()};
+    caixa.querySelector('#calClose').onclick=()=>fundo.remove();
+  }
+  render();
 }
 
 function diaSemana(s){const [a,m,d]=s.split('-').map(Number);return new Date(a,m-1,d,12).getDay()+1}
