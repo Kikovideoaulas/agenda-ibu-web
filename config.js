@@ -8,3 +8,4 @@ const firebaseConfig = {
 };
 
 window.firebaseConfig = firebaseConfig;
+window.AGENDA_IBU_CONFIG = firebaseConfig;
