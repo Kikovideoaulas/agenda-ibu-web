@@ -267,7 +267,21 @@ async function confirmar(){
     });
 
     perfil={...(perfil||{}),nome:n,telefone:t};
-    const resumo=`Olá, Instituto Brasil de Umbanda! Agendei um atendimento.\nNome: ${n}\nWhatsApp: ${t}\nServiços: ${s}\nModalidade: ${modo}\nData: ${dataBR(data)}\nHorário: ${hora}\nTotal dos valores definidos: ${reais(valorSelecionado())}`;
+    const servicosWhats=[...selec].sort((a,b)=>a-b).map(i=>servicos[i][0]).join(', ');
+    const resumo=`Olá, Instituto Brasil de Umbanda! 👋
+
+Gostaria de confirmar meu agendamento.
+
+Nome: ${n}
+WhatsApp: ${t}
+
+Atendimento(s): ${servicosWhats}
+Modalidade: ${modo}
+
+Data: ${dataBR(data)}
+Horário: ${hora}
+
+Total: ${reais(valorSelecionado())}${selec.has(7)?' + valor a consultar':''}`;
 
     view(`<div class="card center"><h2>AGENDAMENTO CONFIRMADO!</h2><p><b>${esc(n)}</b></p><p>${esc(s)}</p><p>${esc(dataBR(data))} às ${esc(hora)}</p><p>Modalidade: ${esc(modo)}</p><p>Seu horário foi registrado no sistema.</p><button id="wa">Enviar detalhes pelo WhatsApp</button><button class="secondary" id="back">Minha conta</button></div>`);
     el('wa').onclick=()=>window.open('https://wa.me/5519994584954?text='+encodeURIComponent(resumo),'_blank','noopener');
