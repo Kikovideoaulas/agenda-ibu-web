@@ -1,79 +1,90 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1"
+  >
+
   <meta name="theme-color" content="#f7f8ff">
 
   <title>Agenda IBU • Instituto Brasil de Umbanda</title>
 
   <link rel="icon" href="./logo-ibu.png">
-  <link rel="stylesheet" href="./estilo.css">
+
+  <!-- VISUAL DO SITE -->
+  <link rel="stylesheet" href="./style.css?v=23">
 </head>
 
 <body>
 
-<div id="app">
+  <div id="app">
 
-  <header>
-    <span>Agenda IBU</span>
-    <span class="badge">Instituto Brasil de Umbanda</span>
-  </header>
+    <header>
+      <span>Agenda IBU</span>
 
-  <main id="view">
+      <span class="badge">
+        Instituto Brasil de Umbanda
+      </span>
+    </header>
 
-    <section class="center">
+    <main id="view">
 
-      <img
-        class="hero-logo"
-        src="./logo-ibu.png"
-        alt="Instituto Brasil de Umbanda"
-      >
+      <section class="center">
 
-      <h1>INSTITUTO BRASIL DE UMBANDA</h1>
+        <img
+          class="hero-logo"
+          src="./logo-ibu.png"
+          alt="Instituto Brasil de Umbanda"
+        >
 
-      <p>Agende seu atendimento com praticidade.</p>
+        <h1>INSTITUTO BRASIL DE UMBANDA</h1>
 
-      <p>
-        Dias e horários disponíveis conforme configuração do Instituto.
-      </p>
+        <p>
+          Agende seu atendimento com praticidade
+        </p>
 
-      <button id="loginStart">
-        Entrar com login e senha
-      </button>
+        <p>
+          Dias e horários disponíveis conforme configuração do Instituto
+        </p>
 
-      <button id="signupStart">
-        Criar cadastro
-      </button>
+        <button id="loginStart">
+          Entrar com login e senha
+        </button>
 
-    </section>
+        <button id="signupStart">
+          Criar cadastro
+        </button>
 
-  </main>
+      </section>
 
-  <footer>
-    Desenvolvido por Junior Freitas
-  </footer>
+    </main>
 
-</div>
+    <footer>
+      Desenvolvido por Junior Freitas
+    </footer>
 
-<div
-  id="toast"
-  role="alert"
-  aria-live="assertive">
-</div>
+  </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <div
+    id="toast"
+    role="alert"
+    aria-live="assertive">
+  </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <!-- CONFIGURAÇÃO -->
+  <script src="./config.js?v=23"></script>
 
-<!-- CONFIGURAÇÃO DO AGENDA IBU -->
-<script src="./config.js"></script>
-
-<!-- APLICATIVO -->
-<script src="./app.js"></script>
+  <!-- APLICATIVO -->
+  <script src="./app.js?v=23"></script>
 
 </body>
 </html>
